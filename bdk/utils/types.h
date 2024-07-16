@@ -1,6 +1,6 @@
 /*
 * Copyright (c) 2018 naehrwert
-* Copyright (c) 2018-2021 CTCaer
+* Copyright (c) 2018-2022 CTCaer
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms and conditions of the GNU General Public License,
@@ -117,6 +117,8 @@ static const u32 colors[6] = {COLOR_RED, COLOR_ORANGE, COLOR_YELLOW, COLOR_GREEN
 #define byte_swap_32(num) ((((num) >> 24) & 0xff) | (((num) << 8) & 0xff0000) | \
 						(((num) >> 8 )& 0xff00) | (((num) << 24) & 0xff000000))
 
+#define likely(x)   (__builtin_expect((x) != 0, 1))
+#define unlikely(x) (__builtin_expect((x) != 0, 0))
 
 /* Bootloader/Nyx */
 #define BOOT_CFG_AUTOBOOT_EN BIT(0)
@@ -152,8 +154,8 @@ typedef struct __attribute__((__packed__)) _boot_cfg_t
 	{
 		struct
 		{
-			char id[8]; // 7 char ASCII null teminated.
-			char emummc_path[0x78]; // emuMMC/XXX, ASCII null teminated.
+			char id[8]; // 7 char ASCII null terminated.
+			char emummc_path[0x78]; // emuMMC/XXX, ASCII null terminated.
 		};
 		u8 ums; // nyx_ums_type.
 		u8 xt_str[0x80];

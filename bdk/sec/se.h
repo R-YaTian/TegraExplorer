@@ -1,6 +1,6 @@
 /*
 * Copyright (c) 2018 naehrwert
-* Copyright (c) 2019-2021 CTCaer
+* Copyright (c) 2019-2022 CTCaer
 * Copyright (c) 2019-2021 shchmue
 *
 * This program is free software; you can redistribute it and/or modify it
@@ -19,6 +19,7 @@
 #ifndef _SE_H_
 #define _SE_H_
 
+#include "se_t210.h"
 #include <utils/types.h>
 
 void se_rsa_acc_ctrl(u32 rs, u32 flags);
@@ -34,20 +35,25 @@ void se_aes_key_partial_set(u32 ks, u32 index, u32 data);
 void se_aes_key_get(u32 ks, void *key, u32 size);
 void se_aes_key_clear(u32 ks);
 void se_aes_iv_clear(u32 ks);
+void se_aes_iv_updated_clear(u32 ks);
 int se_initialize_rng();
 int se_generate_random(void *dst, u32 size);
 int se_generate_random_key(u32 ks_dst, u32 ks_src);
 int se_aes_unwrap_key(u32 ks_dst, u32 ks_src, const void *input);
+int  se_aes_crypt_hash(u32 ks, u32 enc, void *dst, u32 dst_size, const void *src, u32 src_size);
 int se_aes_crypt_cbc(u32 ks, u32 enc, void *dst, u32 dst_size, const void *src, u32 src_size);
 int se_aes_crypt_ecb(u32 ks, u32 enc, void *dst, u32 dst_size, const void *src, u32 src_size);
 int se_aes_crypt_block_ecb(u32 ks, u32 enc, void *dst, const void *src);
-int se_aes_crypt_ctr(u32 ks, void *dst, u32 dst_size, const void *src, u32 src_size, const void *ctr);
-int se_aes_xts_crypt_sec(u32 tweak_ks, u32 crypt_ks, u32 enc, u64 sec, void *dst, const void *src, u32 sec_size);
-int se_aes_xts_crypt(u32 tweak_ks, u32 crypt_ks, u32 enc, u64 sec, void *dst, const void *src, u32 sec_size, u32 num_secs);
+int  se_aes_xts_crypt_sec(u32 tweak_ks, u32 crypt_ks, u32 enc, u64 sec, void *dst, void *src, u32 secsize);
+int  se_aes_xts_crypt_sec_nx(u32 tweak_ks, u32 crypt_ks, u32 enc, u64 sec, u8 *tweak, bool regen_tweak, u32 tweak_exp, void *dst, void *src, u32 sec_size);
+int  se_aes_xts_crypt(u32 tweak_ks, u32 crypt_ks, u32 enc, u64 sec, void *dst, void *src, u32 secsize, u32 num_secs);
+int  se_aes_crypt_ctr(u32 ks, void *dst, u32 dst_size, const void *src, u32 src_size, void *ctr);
 int se_aes_cmac(u32 ks, void *dst, u32 dst_size, const void *src, u32 src_size);
 int se_calc_sha256(void *hash, u32 *msg_left, const void *src, u32 src_size, u64 total_size, u32 sha_cfg, bool is_oneshot);
 int se_calc_sha256_oneshot(void *hash, const void *src, u32 src_size);
 int se_calc_sha256_finalize(void *hash, u32 *msg_left);
+int  se_gen_prng128(void *dst);
+int  se_aes_cmac_128(u32 ks, void *dst, const void *src, u32 src_size);
 int se_calc_hmac_sha256(void *dst, const void *src, u32 src_size, const void *key, u32 key_size);
 
 #endif

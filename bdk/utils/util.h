@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018 naehrwert
- * Copyright (c) 2018-2021 CTCaer
+ * Copyright (c) 2018-2024 CTCaer
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -51,11 +51,11 @@ typedef enum
 	ERR_EXCEPTION  = BIT(31),
 } hekate_errors_t;
 
-typedef struct _cfg_op_t
+typedef struct _reg_cfg_t
 {
-	u32 off;
+	u32 idx;
 	u32 val;
-} cfg_op_t;
+} reg_cfg_t;
 
 typedef struct _nyx_info_t
 {
@@ -76,13 +76,41 @@ typedef struct _nyx_storage_t
 	u8  rsvd[SZ_8M - sizeof(nyx_info_t)];
 	nyx_info_t info;
 	mtc_config_t mtc_cfg;
-	emc_table_t mtc_table[10];
+	emc_table_t mtc_table[11]; // 10 + 1.
 } nyx_storage_t;
+
+// TMR registers.
+#define TIMERUS_CNTR_1US   (0x10 + 0x0)
+#define TIMERUS_USEC_CFG   (0x10 + 0x4)
+#define TIMER_TMR8_TMR_PTV 0x78
+#define TIMER_TMR9_TMR_PTV 0x80
+#define  TIMER_PER_EN       BIT(30)
+#define  TIMER_EN           BIT(31)
+#define TIMER_TMR8_TMR_PCR 0x7C
+#define TIMER_TMR9_TMR_PCR 0x8C
+#define  TIMER_INTR_CLR     BIT(30)
+
+// WDT registers.
+#define TIMER_WDT4_CONFIG         (0x100 + 0x80)
+#define  TIMER_SRC(TMR)    ((TMR) & 0xF)
+#define  TIMER_PER(PER)    (((PER) & 0xFF) << 4)
+#define  TIMER_IRQENABL_EN BIT(12)
+#define  TIMER_FIQENABL_EN BIT(13)
+#define  TIMER_SYSRESET_EN BIT(14)
+#define  TIMER_PMCRESET_EN BIT(15)
+#define TIMER_WDT4_COMMAND        (0x108 + 0x80)
+#define  TIMER_START_CNT   BIT(0)
+#define  TIMER_CNT_DISABLE BIT(1)
+#define TIMER_WDT4_UNLOCK_PATTERN (0x10C + 0x80)
+#define  TIMER_MAGIC_PTRN  0xC45A
 
 u8   bit_count(u32 val);
 u32  bit_count_mask(u8 bits);
+u64  sqrt64(u64 num);
+long strtol(const char *nptr, char **endptr, register int base);
+int  atoi(const char *nptr);
 
-void exec_cfg(u32 *base, const cfg_op_t *ops, u32 num_ops);
+void reg_write_array(u32 *base, const reg_cfg_t *cfg, u32 num_cfg);
 u16  crc16_calc(const u8 *buf, u32 len);
 u32  crc32_calc(u32 crc, const u8 *buf, u32 len);
 
@@ -95,5 +123,6 @@ void msleep(u32 ms);
 void panic(u32 val);
 void power_set_state(power_state_t state);
 void power_set_state_ex(void *param);
+
 
 #endif

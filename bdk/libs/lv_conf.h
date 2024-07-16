@@ -296,6 +296,9 @@
 
 /*Message box (dependencies: lv_rect, lv_btnm, lv_label)*/
 #define USE_LV_MBOX     1
+#if USE_LV_MBOX != 0
+#  define LV_MBOX_CLOSE_ANIM_TIME 200     /*ms*/
+#endif
 
 /*Text area (dependencies: lv_label, lv_page)*/
 #define USE_LV_TA       1

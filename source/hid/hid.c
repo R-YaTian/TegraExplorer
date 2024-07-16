@@ -12,13 +12,18 @@
 static Input_t inputs = {0};
 u16 LbaseX = 0, LbaseY = 0, RbaseX = 0, RbaseY = 0;
 
-void hidInit(){
-    jc_init_hw();
-}
-
 extern hekate_config h_cfg;
 
+#define SLEEP_TIME_MS 40
+bool canUpdate() {
+    static u32 lastUpdateRequest = 0;
+    if (get_tmr_ms() - lastUpdateRequest < SLEEP_TIME_MS) return 0;
+    lastUpdateRequest = get_tmr_ms();
+    return 1;
+}
+
 Input_t *hidRead(){
+    if (!canUpdate()) return &inputs;
     jc_gamepad_rpt_t *controller = joycon_poll();
 
     inputs.buttons = 0;
@@ -45,6 +50,8 @@ Input_t *hidRead(){
     inputs.power = (btn & BTN_POWER) ? 1 : 0;
 
     if (left_connected){
+        // Hoag has inverted Y axis (only the left stick O_o)
+        if (controller->sio_mode) controller->lstick_y *= -1;
         if ((LbaseX == 0 || LbaseY == 0) || controller->l3){
             LbaseX = controller->lstick_x;
             LbaseY = controller->lstick_y;
@@ -97,10 +104,12 @@ Input_t *hidWait(){
 
     while (!(in->buttons))
         hidRead();
+
     return in;
 }
 
 bool hidConnected(){
+    msleep(SLEEP_TIME_MS);
     jc_gamepad_rpt_t *controller = joycon_poll();
     return (controller->conn_l && controller->conn_r) ? 1 : 0;
 }

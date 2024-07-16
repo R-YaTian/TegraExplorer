@@ -11,7 +11,7 @@ include $(DEVKITARM)/base_rules
 IPL_LOAD_ADDR := 0x40008000
 LPVERSION_MAJOR := 4
 LPVERSION_MINOR := 2
-LPVERSION_BUGFX := 0
+LPVERSION_BUGFX := 1
 LPVERSION := \"$(LPVERSION_MAJOR).$(LPVERSION_MINOR).$(LPVERSION_BUGFX)\"
 
 ################################################################################
@@ -64,8 +64,13 @@ all: $(OUTPUTDIR)/$(TARGET)_small.bin
 	@echo "Compressed Payload size is $(COMPR_BIN_SIZE)"
 
 	@echo "Max size is 126296 Bytes."
+ifeq ($(OS),Windows_NT)
+	@if [ ${BIN_SIZE} -gt 126296 ]; then echo "[33mPayload size exceeds limit![0m"; fi
+	@if [ ${COMPR_BIN_SIZE} -gt 126296 ]; then echo "[33mCompressed Payload size exceeds limit![0m"; fi
+else
 	@if [ ${BIN_SIZE} -gt 126296 ]; then echo "\e[1;33mPayload size exceeds limit!\e[0m"; fi
 	@if [ ${COMPR_BIN_SIZE} -gt 126296 ]; then echo "\e[1;33mCompressed Payload size exceeds limit!\e[0m"; fi
+endif
 
 clean:
 	@rm -rf $(BUILDDIR)

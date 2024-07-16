@@ -1,13 +1,13 @@
 #pragma once
 #include <utils/types.h>
 
-//#define BIT(n) (1U << n)
-
 #define JoyY BIT(0)
 #define JoyX BIT(1)
 #define JoyB BIT(2)
 #define JoyA BIT(3)
 #define JoyRB BIT(6)
+#define JoyLMinus BIT(8)
+#define JoyRPlus BIT(9)
 #define JoyMenu BIT(12)
 #define JoyLDown BIT(16)
 #define JoyLUp BIT(17)
@@ -70,7 +70,6 @@ typedef struct _inputs {
     };
 } Input_t;
 
-void hidInit();
 Input_t *hidRead();
 Input_t *hidWait();
 Input_t *hidWaitMask(u32 mask);
